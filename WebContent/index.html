@@ -1,0 +1,87 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ditto - transforming diagrams into OWL ontologies</title>
+        <link href="css/lode/owl.css" rel="stylesheet" type="text/css" />
+		<link href="css/lode/Primer.css" rel="stylesheet" type="text/css" />
+		<link href="css/lode/rec.css" rel="stylesheet" type="text/css" />
+		<link href="css/lode/extra.css" rel="stylesheet" type="text/css" />
+        <meta charset="UTF-8" />
+		<style type="text/css">
+		 	body {
+                background-image: none;
+                background-repeat:no-repeat;
+            }
+            h1 span {
+                font-size:60%;
+            }
+            body a img {
+                float:right;
+            }
+			form {
+				text-align:left; 
+				margin-top:50px;
+				margin-bottom:50px;
+			}
+			h1 {
+				margin-top:0px;
+				float:left;
+			}
+			h1 img {
+				width:95%;
+			}
+			form div {
+				line-height:170%;
+			}
+			.text , .modules label {
+				margin-right:1em;
+			}
+			.reasoner {
+				margin-right:4em;
+			}
+			.noWrap {
+				white-space:nowrap;
+			}
+        </style>
+    </head>
+    <body>
+    	<a href="http://stlab.istc.cnr.it/" title="Go to the homepage of the Semantic Technologies Lab @ CNR"><img src="img/ditto/stlab-logo.png" /></a>
+    	<h1><img src="img/ditto/ditto-logo.png" /></h1>
+		<form enctype="multipart/form-data" action="http://www.essepuntato.it/storenoredir.php" method="post">
+			<input type="hidden" name="caller" value="http://www.essepuntato.it/ditto" />
+			<p>
+				<input type="url" id="url" name="url" placeholder="Put here the complete diagram URL" size="60"/> 
+				or <input type="file" name="file" onchange="form.url.value = ''" /></p>
+			<div>
+				<span class="modules">
+					<label>Modules:</label>
+					<input type="radio" name="type_label" value="er-maximal" checked="checked" /> <span class="text">ER maximal</span>
+					<input type="radio" name="type_label" value="er-intermediate" /> <span class="text">ER intermediate</span>
+					<span class="noWrap">
+						<input type="radio" name="type_label" value="er-minimal" /> <span class="text">ER minimal</span>
+					</span>
+				</span><br />
+				<span class="labels">
+					<label>Labels:</label>
+					<input type="radio" name="look-across-for-labels_label" value="true" checked="checked" /> <span class="text">Look-across</span>
+					<span class="noWrap">
+						<input type="radio" name="look-across-for-labels_label" value="false" /> <span class="text">Look-here</span>
+					</span>
+				</span><br />
+				<span>Specify the prefix: </span>
+				<input type="text" name="ontology-prefix_label" value="" placeholder="'ex' if empty" />
+				<span class="lang noWrap">
+					<label for="number">Specify the ontology URL</label>:
+					<input id="number" type="text" name="ontology-url_label" value="" placeholder="'http://www.essepuntato.it/example' if empty" size="60" />
+				</span>
+			</div>
+			<p><input type="submit" value="Generate OWL"></p>
+		</form>
+                <h2>About the author</h2>
+        <p>
+            <a href="http://palindrom.es/phd/whoami/">Silvio Peroni</a> is a postdoc from the University of Bologna and, for this project, part-time collaborator with the <a href="http://stlab.istc.cnr.it/">Semantic Technologies Lab</a> at <acronym title="Consiglio Nazionale delle Ricerche">CNR</acronym> (i.e. the Italian National Research Council). He maintains a <a href="http://palindrom.es/phd">blog</a> about his research.
+        </p>
+    </body>
+</html>
