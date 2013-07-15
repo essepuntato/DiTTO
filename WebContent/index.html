@@ -79,7 +79,31 @@
 			</div>
 			<p><input type="submit" value="Generate OWL"></p>
 		</form>
-                <h2>About the author</h2>
+		<h2>Transforming E/R diagrams in OWL ontologies</h2>
+		<p><strong>DiTTO</strong>, which stands for <em>Diagrams Transformations inTo OWL</em>,
+		is a Web application that is able to translate E/R diagrams expressed 
+		in crow’s foot notation and created with <a href="http://www.yworks.com/en/products_yed_about.html" title="yEd homepage">yEd</a>, 
+		an open source application to quickly and effectively generate high-quality diagrams, 
+		into OWL ontologies.</p>
+		<p>DiTTO allows one to choose what E/R semantics to apply for the transformation according to three alternative
+		conversion strategies, which depends on the application of two assumptions:</p>
+		<ul>
+			<li><strong>global semantics (GS)</strong> is a characteristic of OWL ontologies (but not typically of E/R), and has the effect of unifying 
+			the formal interpretation of domain and range axioms, property characteristics, and all the restrictions that act at a 
+			global level. When GS does not hold, one is not allowed to assume such unification, even when the axioms regard two constants 
+			with the same name;</li>
+			<li><strong>unique name assumption (UNA)</strong>, which is a characteristic in E/R seman- tics (but not of OWL), and whose 
+			consequence is that two objects named differently always refer to different entities in the world.</li>
+		</ul>
+		<p>In particular, the <em>minimal strategy</em> interprets the semantics of E/R in its purest form by not using GS, while using UNA, 
+		the <em>intermediate strategy</em> does not use either GS or UNA, and finally the <em>maximal strategy</em>, which is the closest 
+		to OWL semantics, use GS, but UNA does not hold.</p>
+		<h2>Additional materials</h2>
+		<p>DiTTO is an open source tool hosted by <a href="http://www.github.com/essepuntato/DiTTO">GitHub</a>. The exemplar yEd diagram 
+		described in the following picture is <a href="diagram.graphml">available</a> so as to test the service.</p>
+		<p class="image"><img src="img/ditto/diagram.png" /></p>
+		
+        <h2>About the author</h2>
         <p>
             <a href="http://palindrom.es/phd/whoami/">Silvio Peroni</a> is a postdoc from the University of Bologna and, for this project, part-time collaborator with the <a href="http://stlab.istc.cnr.it/">Semantic Technologies Lab</a> at <acronym title="Consiglio Nazionale delle Ricerche">CNR</acronym> (i.e. the Italian National Research Council). He maintains a <a href="http://palindrom.es/phd">blog</a> about his research.
         </p>
