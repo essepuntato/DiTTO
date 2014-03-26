@@ -1,14 +1,13 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Ditto - transforming diagrams into OWL ontologies</title>
-        <link href="css/lode/owl.css" rel="stylesheet" type="text/css" />
-		<link href="css/lode/Primer.css" rel="stylesheet" type="text/css" />
-		<link href="css/lode/rec.css" rel="stylesheet" type="text/css" />
-		<link href="css/lode/extra.css" rel="stylesheet" type="text/css" />
-        <meta charset="UTF-8" />
+	<head>
+		<title>Ditto - transforming diagrams into OWL ontologies</title>
+		<link href="http://www.essepuntato.it/css/lode/owl.css" rel="stylesheet" type="text/css" />
+		<link href="http://www.essepuntato.it/css/lode/Primer.css" rel="stylesheet" type="text/css" />
+		<link href="http://www.essepuntato.it/css/lode/rec.css" rel="stylesheet" type="text/css" />
+		<link href="http://www.essepuntato.it/css/lode/extra.css" rel="stylesheet" type="text/css" />
+		<meta charset="UTF-8" />
 		<style type="text/css">
 		 	body {
                 background-image: none;
@@ -35,7 +34,7 @@
 			form div {
 				line-height:170%;
 			}
-			.text , .modules label {
+			.text {
 				margin-right:1em;
 			}
 			.reasoner {
@@ -44,11 +43,17 @@
 			.noWrap {
 				white-space:nowrap;
 			}
+			.type {
+				background-color:AliceBlue;
+				border: 1px solid LightSteelBlue;
+				padding: 2px;
+				margin-left:5px;
+			}
         </style>
-    </head>
-    <body>
-    	<a href="http://stlab.istc.cnr.it/" title="Go to the homepage of the Semantic Technologies Lab @ CNR"><img src="img/ditto/stlab-logo.png" /></a>
-    	<h1><img src="img/ditto/ditto-logo.png" /></h1>
+	</head>
+	<body>
+		<a href="http://stlab.istc.cnr.it/" title="Go to the homepage of the Semantic Technologies Lab @ CNR"><img src="http://www.essepuntato.it/img/ditto/stlab-logo.png" /></a>
+		<h1><img src="http://www.essepuntato.it/img/ditto/ditto-logo.png" /></h1>
 		<form enctype="multipart/form-data" action="http://www.essepuntato.it/storenoredir.php" method="post">
 			<input type="hidden" name="caller" value="http://www.essepuntato.it/ditto" />
 			<p>
@@ -57,55 +62,86 @@
 			<div>
 				<span class="modules">
 					<label>Modules:</label>
-					<input type="radio" name="type_label" value="er-maximal" checked="checked" /> <span class="text">ER maximal</span>
-					<input type="radio" name="type_label" value="er-intermediate" /> <span class="text">ER intermediate</span>
-					<span class="noWrap">
-						<input type="radio" name="type_label" value="er-minimal" /> <span class="text">ER minimal</span>
+					<span class="type">
+						E/R: 
+						<span class="noWrap">
+							<input type="radio" name="type_label" value="graffoo" checked="checked" onchange="document.getElementById('erlabels').style.display = 'initial';document.getElementById('erprefix').style.display = 'initial';document.getElementById('graffooparams').style.display = 'none';" /> <span class="text">maximal</span>
+						</span>
+						<span class="noWrap">
+							<input type="radio" name="type_label" value="er-intermediate" onchange="document.getElementById('erlabels').style.display = 'initial';document.getElementById('erprefix').style.display = 'initial';document.getElementById('graffooparams').style.display = 'none';" /> <span class="text">intermediate</span>
+						</span>
+						<span class="noWrap">
+							<input type="radio" name="type_label" value="er-minimal" onchange="document.getElementById('erlabels').style.display = 'initial';document.getElementById('erprefix').style.display = 'initial';document.getElementById('graffooparams').style.display = 'none';" /> <span class="text">minimal</span>
+						</span>
+					</span>
+					<span class="noWrap type">
+						<input type="radio" name="type_label" value="graffoo" onchange="document.getElementById('erlabels').style.display = 'none';document.getElementById('erprefix').style.display = 'none';document.getElementById('graffooparams').style.display = 'initial';" /> <span class="text">Graffoo</span>
 					</span>
 				</span><br />
-				<span class="labels">
+				<span id="erlabels" class="labels">
 					<label>Labels:</label>
-					<input type="radio" name="look-across-for-labels_label" value="true" checked="checked" /> <span class="text">Look-across</span>
+					<span class="noWrap">
+						<input type="radio" name="look-across-for-labels_label" value="true" checked="checked" /> <span class="text">Look-across</span>
+					</span>
 					<span class="noWrap">
 						<input type="radio" name="look-across-for-labels_label" value="false" /> <span class="text">Look-here</span>
 					</span>
+				</span>
+				<span id="graffooparams" class="labels" style="display:none">
+					<label>Parameters:</label>
+					<span class="noWrap">
+						<input type="checkbox" name="main-ontology-only_label" value="true" checked="checked" /> <span class="text">Only the main ontology</span>
+					</span>
+					<span class="noWrap">
+						<input type="checkbox" name="version-iri-imported_label" value="false"/> <span class="text">Use version IRI for imported</span>
+					</span>
 				</span><br />
-				<span>Specify the prefix: </span>
-				<input type="text" name="ontology-prefix_label" value="" placeholder="'ex' if empty" />
-				<span class="lang noWrap">
-					<label for="number">Specify the ontology URL</label>:
-					<input id="number" type="text" name="ontology-url_label" value="" placeholder="'http://www.essepuntato.it/example' if empty" size="60" />
+				<span id="erprefix" class="noWrap">
+					<label>Specify the prefix: </label>
+					<input type="text" name="ontology-prefix_label" value="" placeholder="'ex' if empty" />
+				</span>
+				<span class="noWrap">
+					<label>Specify the ontology URL: </label>
+					<input type="text" name="ontology-url_label" value="" placeholder="'http://www.essepuntato.it/example' if empty" size="60" />
 				</span>
 			</div>
-			<p><input type="submit" value="Generate OWL"></p>
+			<p><input type="submit" value="Generate OWL" /></p>
 		</form>
-		<h2>Transforming E/R diagrams in OWL ontologies</h2>
-		<p><strong>DiTTO</strong>, which stands for <em>Diagrams Transformations inTo OWL</em>,
-		is a Web application that is able to translate E/R diagrams expressed 
-		in crow’s foot notation and created with <a href="http://www.yworks.com/en/products_yed_about.html" title="yEd homepage">yEd</a>, 
-		an open source application to quickly and effectively generate high-quality diagrams, 
-		into OWL ontologies.</p>
-		<p>DiTTO allows one to choose what E/R semantics to apply for the transformation according to three alternative
-		conversion strategies, which depends on the application of two assumptions:</p>
+		<h2>Transforming yEd diagrams in OWL ontologies</h2>
+		<p><strong>DiTTO</strong>, which stands for <em>Diagrams Transformation inTo OWL</em> (version 1.1, dated 25 July 2014),
+			is a Web application that is able to translate diagrams expressed either in 
+			E/R crow’s foot notation or <a href="http://www.essepuntato.it/graffoo" title="Graffoo homepage">Graffoo</a> and created with <a href="http://www.yworks.com/en/products_yed_about.html" title="yEd homepage">yEd</a>, 
+			an open source application to quickly and effectively generate high-quality diagrams, 
+			into OWL ontologies.</p>
+		<p>If you choose to specify E/R diagrams, DiTTO allows one to choose what E/R semantics to apply for the transformation according to three alternative
+			conversion strategies, which depends on the application of two assumptions:</p>
 		<ul>
 			<li><strong>global semantics (GS)</strong> is a characteristic of OWL ontologies (but not typically of E/R), and has the effect of unifying 
-			the formal interpretation of domain and range axioms, property characteristics, and all the restrictions that act at a 
-			global level. When GS does not hold, one is not allowed to assume such unification, even when the axioms regard two constants 
-			with the same name;</li>
-			<li><strong>unique name assumption (UNA)</strong>, which is a characteristic in E/R seman- tics (but not of OWL), and whose 
-			consequence is that two objects named differently always refer to different entities in the world.</li>
+				the formal interpretation of domain and range axioms, property characteristics, and all the restrictions that act at a 
+				global level. When GS does not hold, one is not allowed to assume such unification, even when the axioms regard two constants 
+				with the same name;</li>
+			<li><strong>unique name assumption (UNA)</strong>, which is a characteristic in E/R semantics (but not of OWL), and whose 
+				consequence is that two objects named differently always refer to different entities in the world.</li>
 		</ul>
 		<p>In particular, the <em>minimal strategy</em> interprets the semantics of E/R in its purest form by not using GS, while using UNA, 
-		the <em>intermediate strategy</em> does not use either GS or UNA, and finally the <em>maximal strategy</em>, which is the closest 
-		to OWL semantics, use GS, but UNA does not hold.</p>
+			the <em>intermediate strategy</em> does not use either GS or UNA, and finally the <em>maximal strategy</em>, which is the closest 
+			to OWL semantics, use GS, but UNA does not hold.</p>
 		<h2>Additional materials</h2>
-		<p>DiTTO is an open source tool hosted by <a href="http://www.github.com/essepuntato/DiTTO">GitHub</a>. The exemplar yEd diagram 
-		described in the following picture is <a href="diagram.graphml">available</a> so as to test the service.</p>
-		<p class="image"><img src="img/ditto/diagram.png" /></p>
+		<p>DiTTO is an open source tool hosted by <a href="http://www.github.com/essepuntato/DiTTO">GitHub</a>. The exemplar yEd diagrams, in E/R crow's foot and Graffoo, 
+			described in the following pictures are available (<a href="http://www.essepuntato.it/er-diagram.graphml">E/R diagram</a> and <a href="http://www.essepuntato.it/graffoo-diagram.graphml">Graffoo diagram</a>) so as to test the service.</p>
+		<p class="image"><img src="http://www.essepuntato.it/img/ditto/er-diagram.png" /><img src="http://www.essepuntato.it/img/ditto/graffoo-diagram.png" style="max-width:600px" /></p>
 		
-        <h2>About the author</h2>
-        <p>
-            <a href="http://palindrom.es/phd/whoami/">Silvio Peroni</a> is a postdoc from the University of Bologna and, for this project, part-time collaborator with the <a href="http://stlab.istc.cnr.it/">Semantic Technologies Lab</a> at <acronym title="Consiglio Nazionale delle Ricerche">CNR</acronym> (i.e. the Italian National Research Council). He maintains a <a href="http://palindrom.es/phd">blog</a> about his research.
-        </p>
-    </body>
+		<h2>Publications</h2>
+		<ul>
+			<li>Gangemi, A., Peroni, S. (2013). DiTTO: Diagrams Transformation inTo OWL. In Proceedings of the ISWC 2013 Posters &amp; Demos Track (ISWC-PD 2013), CEUR Workshop Proceedings. Aachen, Germany: CEUR-WS.org. <a href="http://ceur-ws.org/Vol-1035/iswc2013_demo_2.pdf">http://ceur-ws.org/Vol-1035/iswc2013_demo_2.pdf</a>.</li>
+		</ul>
+		
+		<h2>About the authors</h2>
+		<p>
+			<a href="http://palindrom.es/phd/whoami/">Silvio Peroni</a> is a postdoc from the University of Bologna and, for this project, part-time collaborator with the <a href="http://stlab.istc.cnr.it/">Semantic Technologies Lab</a> at <acronym title="Consiglio Nazionale delle Ricerche">CNR</acronym> (i.e. the Italian National Research Council). He created and maintains DiTTO, and he have developed the XSLT files to convert E/R diagrams into OWL. He maintains a <a href="http://palindrom.es/phd">blog</a> about his research.
+		</p>
+		<p>
+			Riccardo Falco has a Bachelor Degree in Computer Science. His Bachelor Thesis concerned the extension of DiTTO with additional XSLT files to convert Graffoo diagrams into OWL.
+		</p>
+	</body>
 </html>
