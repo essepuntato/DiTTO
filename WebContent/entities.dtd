@@ -1,0 +1,54 @@
+
+<!-- character entities -->
+<!ENTITY newline "&#13;">
+<!ENTITY tab "&#9;">
+
+
+<!-- RTFs node names -->
+<!ENTITY ontology "ontology">
+<!ENTITY prefix "prefix">
+<!ENTITY datarange "datarange">
+<!ENTITY datarange-restriction "datarange-restriction">
+<!ENTITY class "class">
+<!ENTITY class-restriction "class-restriction">
+<!ENTITY individual "individual">
+<!ENTITY literal "literal">
+<!ENTITY object-property "object-property">
+<!ENTITY object-property-facility "object-property-facility">
+<!ENTITY data-property "data-property">
+<!ENTITY data-property-facility "data-property-facility">
+<!ENTITY annotation-property "annotation-property">
+<!ENTITY annotation-property-facility "annotation-property-facility">
+<!ENTITY axiom "axiom">
+<!ENTITY additional-axiom "additional-axiom">
+<!ENTITY rule "rule">
+ 
+ 
+<!-- class of RTFs nodes -->
+<!ENTITY edges "object-property object-property-facility data-property
+    data-property-facility annotation-property annotation-property-facility
+    axiom">
+<!ENTITY entities "datarange datarange-restriction class class-restriction 
+    individual literal object-property object-property-facility data-property
+    data-property-facility annotation-property annotation-property-facility">
+<!ENTITY nodes-for-empty-prefix "datarange class individual object-property 
+    object-property-facility data-property data-property-facility 
+    annotation-property annotation-property-facility">
+
+
+<!-- other constant values -->
+<!ENTITY swrl-language "swrl">
+<!ENTITY root-element "root-element">
+<!ENTITY import-axiom "Import">
+<!ENTITY subclassof-axiom "SubClassOf">
+<!ENTITY range-axiom "Range">
+<!ENTITY domain-axiom "Domain">
+<!ENTITY types-axiom "Types">
+<!ENTITY owl-thing "owl:Thing">
+
+
+<!-- @type attribute value of straight data type 
+    (utils.xsl, phase1, "Target of additional axioms" section) -->
+<!ENTITY generic-straight "1">
+<!ENTITY vertical-straight "2">
+
