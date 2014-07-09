@@ -1,19 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2014, Riccardo Falco <rky.falco@gmail.com>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
--->
 <!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
 <xsl:stylesheet version="2.0" 
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -32,7 +17,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
     
     <!-- 
-        Import all Graffoo widget, generating specific XML elements with specific attributes:
+        Import all Graffoo widgets, generating specific XML elements with specific attributes:
         
             ontology: id, name, main-ontology
             prefix: prefix, uri, ontology-id
@@ -216,9 +201,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
             <xsl:choose>
                 
                 <!-- the axiom refers to node entity (one or more) -->
-                <xsl:when test="exists($root//g:node[@id = $target-ids])">
+                <xsl:when test="exists($root//g:node[utls:contains-id(@id, $target-ids)])">
                     
-                    <xsl:variable name="target-nodes" as="node()+" select="$root//g:node[@id = $target-ids]"/>
+                    <xsl:variable name="target-nodes" as="node()+" select="$root//g:node[utls:contains-id(@id, $target-ids)]"/>
                     
                     <!-- for each node referred by the axiom generate an additional axiom node 
                         that refers to it -->
@@ -367,7 +352,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
             <!-- rdfs:isDefinedBy annotation if not already defined -->
             
             <xsl:variable name="rdfs-is-defined-by" as="xs:string" select="utls:get-imported-ontology-iri(
-                $ontologies-from-graphml/rtf:*[@id eq $ontology-id]/@name)"/>
+                $ontologies-from-graphml/rtf:*[utls:contains-id(@id, $ontology-id)]/@name)"/>
             
             <xsl:element name="additional-axiom" namespace="{$rtf-namespace}">
                 <xsl:attribute name="name" select="concat('Annotations: rdfs:isDefinedBy ', $rdfs-is-defined-by)"/>
@@ -480,7 +465,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 <!-- rdfs:isDefinedBy annotation if not already defined -->
                 
                 <xsl:variable name="rdfs-is-defined-by" as="xs:string" select="utls:get-imported-ontology-iri(
-                    $ontologies-from-graphml/*[@id eq $ontology-id]/@name)"/>
+                    $ontologies-from-graphml/*[utls:contains-id(@id,$ontology-id)]/@name)"/>
                 
                 <xsl:element name="&additional-axiom;" namespace="{$rtf-namespace}">
                     <xsl:attribute name="name" select="concat('Annotations: rdfs:isDefinedBy ',$rdfs-is-defined-by)"/>
@@ -591,10 +576,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         <xsl:for-each select="$rtf/rtf:&axiom;">
             <xsl:variable name="axiom" as="node()" select="current()"/>
             
-            <xsl:variable name="source-entity" as="node()" select="$rtf/rtf:*[@id eq $axiom/@source-id]"/>
+            <xsl:variable name="source-entity" as="node()" select="$rtf/rtf:*[utls:contains-id(@id,$axiom/@source-id)]"/>
             <xsl:variable name="source-type" as="xs:string" select="local-name($source-entity)"/>
             
-            <xsl:variable name="target-entity" as="node()" select="$rtf/rtf:*[@id eq $axiom/@target-id]"/>
+            <xsl:variable name="target-entity" as="node()" select="$rtf/rtf:*[utls:contains-id(@id,$axiom/@target-id)]"/>
             <xsl:variable name="target-type" as="xs:string" select="local-name($target-entity)"/>
             
             
@@ -636,13 +621,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                                 
                                 <xsl:variable name="current-entity-instances-in-graph" as="node()*" 
                                     select="$rtf/rtf:*[@name eq $current-entity/@name]
-                                    (: not source/target entity :)[not(@id = ($source-entity/@id, $target-entity/@id))]"/>
+                                    (: not source/target entity :)[not(utls:contains-id(@id, ($source-entity/@id, $target-entity/@id)))]"/>
                                 <xsl:variable name="current-entity-instances-types" as="xs:string*" 
                                     select="for $instance in $current-entity-instances-in-graph return local-name($instance)"/>
                                 
                                 <xsl:variable name="other-entity-instances-in-graph" as="node()*" 
                                     select="$rtf/rtf:*[@name eq $other-entity/@name]
-                                    (: not source/target entity :)[not(@id = ($source-entity/@id,$target-entity/@id))]"/>
+                                    (: not source/target entity :)[not(utls:contains-id(@id, ($source-entity/@id,$target-entity/@id)))]"/>
                                 <xsl:variable name="other-entity-instances-types" as="xs:string*" 
                                     select="for $instance in $other-entity-instances-in-graph return local-name($instance)"/>
                                 
@@ -746,7 +731,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                         <xsl:copy-of select="$current-entity/attribute::*[local-name(.) ne 'id']"/>
                     </xsl:element>
                     
-                    <xsl:for-each select="$rtf/rtf:&additional-axiom;[@target-id eq $current-entity/@id]">
+                    <xsl:for-each select="$rtf/rtf:&additional-axiom;[utls:contains-id($current-entity/@id, @target-id)]">
                         <xsl:element name="&additional-axiom;" namespace="{$rtf-namespace}">
                             <xsl:copy-of select="current()/attribute::*[local-name(.) ne 'target-id']"/>
                             <xsl:attribute name="target-id" 
@@ -778,42 +763,48 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
     
     
-    <!-- importa le entità utilizzate e appartenenti a ontologie importate -->
+    <!-- import entities that belong to imported ontologies -->
     <xsl:template name="import-entities">
         <xsl:param name="rtf" as="node()"/>
             
-        <!-- analizza tutte gli elementi "importabili" -->
-        <xsl:for-each select="$rtf/*[contains('&entities;', local-name(.))]">
+        <!-- analyze each entities -->
+        <xsl:for-each select="$rtf/rtf:*[contains('&entities;', local-name(.))]">
             <xsl:variable name="entity" as="node()" select="current()"/>
             
-            <!-- links all'entità corrente appartenenti a ontologie differenti -->
-            <xsl:variable name="ontologies-that-link-current-entity" as="xs:string*" select="$rtf/*
+            <!-- ontologies that hold a link to current entity, excluded the entity's ontology -->
+            <xsl:variable name="ontologies-that-link-current-entity" as="xs:string*" select="$rtf/rtf:*
                 [contains('&edges;',local-name(.))][not(utls:contains-id(@ontology-id, $entity/@ontology-id))]
-                [$entity/@id = (@source-id,@target-id)]/@ontology-id"/>
+                [utls:contains-id($entity/@id, (@source-id,@target-id))]/@ontology-id"/>
             
+            <!-- ontologies that import current entity (directly or indirectly) -->
             <xsl:variable name="ontologies-that-import-current-entity" as="xs:string*" select="$rtf/rtf:&ontology;
                 [utls:is-ontology-reachable(@id, $entity/@ontology-id)]/@id"/>
             
-            <!-- l'entità apparterrà a tutte le ontologie cui appartengono i link -->
+            <!-- update current entity's ontology-id attr -->
             <xsl:element name="{local-name(current())}" namespace="{$rtf-namespace}">
                 <xsl:copy-of select="attribute::*[local-name(.) ne 'ontology-id']"/>
-                <xsl:attribute name="ontology-id" select="utls:add-ids(@ontology-id, $ontologies-that-link-current-entity)"/>
-<!--                <xsl:attribute name="ontology-id" select="utls:add-ids(@ontology-id, $ontologies-that-import-current-entity)"/>-->
+                <xsl:attribute name="ontology-id" select="
+                    (: the entity belong to those ontologies that hold a link to it :)
+                    utls:add-ids(@ontology-id, $ontologies-that-link-current-entity)
+                    
+                    (: the entity belong to those ontologies that import it :)
+                    (:utls:add-ids(@ontology-id, $ontologies-that-import-current-entity):)
+                    "/>
             </xsl:element>
             
-            <!-- duplica eventuali additional axiom riferite all'entità in modo che compaiano anche 
-                nelle nuove ontologie -->
-            <xsl:if test="exists($ontologies-that-import-current-entity)">
-                
-                <xsl:for-each select="$rtf/rtf:&additional-axiom;[@target-id eq $entity/@id]">
-                    <xsl:element name="&additional-axiom;" namespace="{$rtf-namespace}">
-                        <xsl:copy-of select="current()/attribute::*[local-name(.) ne 'ontology-id']"/>
-    <!--                    <xsl:attribute name="ontology-id" select="$ontologies-that-link-current-entity"/>-->
-                        <xsl:attribute name="ontology-id" select="$ontologies-that-import-current-entity"/>
-                    </xsl:element>    
-                </xsl:for-each>
-            
-            </xsl:if>
+            <!-- update eventual additional axioms referred to current entity -->
+            <xsl:for-each select="$rtf/rtf:&additional-axiom;[utls:contains-id($entity/@id, @target-id)]">
+                <xsl:element name="&additional-axiom;" namespace="{$rtf-namespace}">
+                    <xsl:copy-of select="attribute::*[local-name(.) ne 'ontology-id']"/>
+                    <xsl:attribute name="ontology-id" select="
+                        (: the axiom belong to those ontologies that hold a link to current entity :)
+                        $ontologies-that-link-current-entity 
+                        
+                        (: the axiom belong to those ontologies that import current entity :)
+                        (:$ontologies-that-import-current-entity:)
+                        "/>
+                </xsl:element>    
+            </xsl:for-each>
             
         </xsl:for-each>
             
@@ -826,6 +817,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
     
     
+    <!-- detect entities not already declared as widgets by the user from Manchester strings and SWRL rules -->
     <xsl:template name="analyze-manchester-strings-and-swrl-rules">
         <xsl:param name="rtf" as="node()"/>
         <xsl:param name="entities-not-recognized" as="xs:integer" select="0"/>
@@ -836,25 +828,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         <xsl:variable name="new-entities" as="node()*">
             
             <!-- Manchester strings analysis -->
-            <xsl:for-each select="$rtf/(rtf:class-restriction | rtf:datarange-restriction |rtf:additional-axiom[not(@auto-generated)])">
+            <xsl:for-each select="$rtf/(rtf:&class-restriction; | rtf:&datarange-restriction; |
+                rtf:&additional-axiom;[not(@auto-generated)])">
                 <xsl:copy-of select="utls:get-entities-from-manchester-string(@name, 
-                    if (local-name(current()) eq 'class-restriction') then 'description' else
-                    if (local-name(current()) eq 'datarange-restriction') then 'datarange' else
-                    local-name($rtf/rtf:*[@id = current()/@target-id][1]), $rtf, @ontology-id, $is-last-scan)"/>
-            </xsl:for-each>
-            <xsl:for-each select="$rtf/()">
-                <xsl:copy-of select="utls:get-entities-from-manchester-string(
-                    @name, 'description', $rtf, @ontology-id, $is-last-scan)"/>
+                    if (local-name(current()) eq '&class-restriction;') then '&description;' else
+                    if (local-name(current()) eq '&datarange-restriction;') then '&datarange;' else
+                    local-name($rtf/rtf:*[utls:contains-id(@id, current()/@target-id)][1]), $rtf, @ontology-id, $is-last-scan)"/>
             </xsl:for-each>
             
             <!-- SWRL rules analysis -->
-            <xsl:for-each select="$rtf/rtf:rule">
+            <xsl:for-each select="$rtf/rtf:&rule;">
                 <xsl:copy-of select="utls:get-entities-from-swrl-rule(@name, $rtf, @ontology-id, $is-last-scan)"/>
             </xsl:for-each>
                 
         </xsl:variable>
-        
-<!--        <xsl:copy-of select="$rtf/rtf:*, $new-entities"/>-->
         
         <!-- counts how many entities have not been recognized -->
         <xsl:variable name="updated-entities-not-recognized" as="xs:integer" 
@@ -933,10 +920,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 </xsl:for-each>
                 
                 <!-- copy all the other elements -->
-                <xsl:copy-of select="$updated-rtf/rtf:*[not(local-name(.) = ('additional-axiom', 'class-restriction'))]"/>
-                
-<!--                <xsl:copy-of select="$updated-rtf/rtf:*"/>-->
-<!--                <xsl:copy-of select="$new-entities"/>-->
+                <xsl:copy-of select="$updated-rtf/rtf:*[not(local-name(.) = ('&additional-axiom;', '&class-restriction;'))]"/>
             </xsl:otherwise>
             
         </xsl:choose>
@@ -944,17 +928,51 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     </xsl:template>
     
     
-
+    
+    <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    Remove duplicates
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
+    
+    
+    <!-- collapse each duplicates in a single entity -->
+    <xsl:template name="remove-duplicates">
+        <xsl:param name="rtf" as="node()"/>
+        
+        <!-- analyze each ontology -->
+        <xsl:for-each select="$rtf/rtf:&ontology;">
+            <xsl:variable name="current-ontology" as="node()" select="current()"/>
+            
+            <!-- get all duplicated nodes (classes, dataranges, individuals) -->
+            <xsl:for-each-group select="$rtf/rtf:*[contains('&nodes;', local-name(.))]
+                [utls:contains-id(@ontology-id, $current-ontology/@id)]" group-by="@name">
+                
+                <!-- create an entity that represents all duplicates -->
+                <xsl:element name="{local-name(current())}" namespace="{$rtf-namespace}">
+                    <xsl:attribute name="id" select="string-join(for $duplicate in current-group()
+                        return $duplicate/@id, ' ')"/>
+                    <xsl:copy-of select="@*[local-name(.) ne 'id']"/>
+                </xsl:element>
+            </xsl:for-each-group>
+            
+        </xsl:for-each>
+        
+        <!-- copy all not node entities -->
+        <xsl:copy-of select="$rtf/rtf:*[not(contains('&nodes;', local-name(.)))]"/>
+        
+    </xsl:template>
+    
+    
+    
     <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     Translate to Manchester
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
     
     
-    <!-- effettua l'ordinamento e la traduzione vera e propria in Manchester syntax -->    
+    <!-- sort and translate in Manchester OWL syntax -->
     <xsl:template name="translate-to-manchester">
         <xsl:param name="rtf" as="node()"/>
         
-        <!-- analizza tutte le ontologie -->
+        <!-- analyze each ontologies -->
         <xsl:for-each select="$rtf/rtf:&ontology;">
             
             <xsl:variable name="current-ontology" as="node()" select="current()"/>
@@ -962,11 +980,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
             
             <xsl:element name="ontology" namespace="{$rtf-namespace}">
                 
-                <!-- l'ontologia corrente è la main ontology se non viene importata da nessuna altra ontologia -->
+                <!-- current ontology is the main ontology if it is not imported by any other ontologies -->
                 <xsl:variable name="is-the-main-ontology" as="xs:boolean" 
                     select="not(exists($rtf/rtf:&axiom;[@name eq '&import-axiom;']
                     [utls:contains-id(@target-id, $current-ontology-id)]))"/>
                 
+                <!-- for each ontology create an ontology node that contains the Manchester statements
+                    that define it -->
                 <xsl:copy-of select="attribute::*"/>
                 <xsl:if test="$is-the-main-ontology">
                     <xsl:attribute name="main-ontology"/>
@@ -977,19 +997,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
                 <!-- prefixes declaration -->
                 
-                <!-- entità semplici (escluse restrizioni) per verificare l'effettivo utilizzo del prefisso vuoto -->
+                <!-- simple entities to verify the use of empty prefix -->
                 <xsl:variable name="simple-entities" as="xs:string*" select="$rtf/rtf:*[contains('&nodes-for-empty-prefix;', local-name(.))]
                     [utls:contains-id(@ontology-id, $current-ontology-id)]/@name"/>
                 
+                <!-- if there're entities that use the empty prefix -->
                 <!-- esistono entità (semplici) che utilizzano il prefisso vuoto -->
                 <xsl:if test="some $entity in $simple-entities satisfies utls:contains-prefixes($entity,'')">
                     
-                    <!-- eventuale prefisso vuoto definito dall'utente -->
+                    <!-- eventual user defined empty prefix --> 
                     <xsl:variable name="user-defined-empty-prefix" as="node()?" select="$rtf/rtf:&prefix;
                         [utls:contains-id(@ontology-id,$current-ontology-id)][@prefix eq '']"/>
                     
-                    <!-- se l'utente ha definito un proprio prefisso vuoto dichiara quello, altrimenti utilizza
-                        quello di default (config.xsl e config.xml) -->
+                    <!-- if there's an user defined empty prefix deflare it, else declare a default empty prefix 
+                        (config.xsl) -->
                     <xsl:call-template name="translate-element">
                         <xsl:with-param name="element" select="if (exists($user-defined-empty-prefix)) then 
                             $user-defined-empty-prefix else $default-empty-prefix"/>
@@ -997,12 +1018,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                     
                 </xsl:if>
                 
-                <!-- oggetti su cui verificare l'effettivo utilizzo dei prefissi non vuoti -->
+                <!-- nodes to verify the use of not empty prefixes -->
                 <xsl:variable name="nodes-for-not-empty-prefix" as="xs:string*" select="
                     $rtf/rtf:*[not(local-name(.) = ('&ontology;','&prefix;'))][utls:contains-id(@ontology-id, $current-ontology-id)]/@name, 
                     $rtf/rtf:&additional-axiom;[@target-id = $rtf/rtf:*[utls:contains-id(@id, $current-ontology-id)]]/@name"/>
-                
-                <!-- prefissi (non vuoti) definiti dall'utente o di default in owl effettivamente utilizzati -->
+
+                <!-- user defined not empty prefixes and default owl prefixes (really used) -->
                 <xsl:for-each-group select="($owl2-default-prefixes, $rtf/rtf:&prefix;)
                     [some $entity in $nodes-for-not-empty-prefix satisfies utls:contains-prefixes($entity, @prefix)]" 
                     group-by="@prefix">
@@ -1022,13 +1043,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 </xsl:call-template>
                 
                 
-                <!-- è possibile utilizzare l'ordinamento gerarchico ($use-hierarchic-sorting a true, default, config.xsl)
-                    oppure l'ordinamento di base -->
+                <!-- it's possible to use hierarchic or basic sorting method -->
                 <xsl:variable name="hierarchic-tree" as="node()">
                     <xsl:element name="hierarchic-tree" namespace="{$rtf-namespace}">
                         
                         <xsl:if test="$use-hierarchical-visit">
                             
+                            <!-- declare entities derived from owl:Thing class -->
                             <xsl:call-template name="hierarchic-visit">
                                 <xsl:with-param name="rtf" select="$rtf"/>
                                 <xsl:with-param name="current-ontology" select="$current-ontology-id"/>
@@ -1036,12 +1057,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                                 <xsl:with-param name="classes-already-visited" select="()"/>
                             </xsl:call-template>
                             
+                            <!-- split classes in different hierarchies -->
                             <xsl:variable name="class-hierarchies" as="node()"
                                 select="utls:split-root-classes-in-different-hierarchies($rtf, $current-ontology-id)"/>
                             
+                            <!-- declare entities derived from hierarchies's roots --> 
                             <xsl:for-each select="$class-hierarchies/rtf:hierarchy">
                                 <xsl:sort select="@name"/>
-<!--                                <xsl:sort select="count(rtf:&class;)" order="descending"/>-->
                                 <xsl:call-template name="hierarchic-visit">
                                     <xsl:with-param name="rtf" select="$rtf"/>
                                     <xsl:with-param name="current-ontology" select="$current-ontology-id"/>
@@ -1055,7 +1077,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 </xsl:variable>
                 
                 
-                <!-- traduci gli eventuali nodi in hierarchic-tree -->
+                <!-- translate eventual nodes in hierarchic-tree -->
                 <xsl:for-each select="$hierarchic-tree/rtf:*">
                     <xsl:call-template name="translate-element">
                         <xsl:with-param name="rtf" select="$rtf"/>
@@ -1067,7 +1089,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 <!-- classes -->
                 <xsl:for-each select="if (not($use-hierarchical-visit)) then $owl-thing else (), 
                     $rtf/rtf:&class;[utls:contains-id(@ontology-id,$current-ontology-id)]
-                    [not(@id = $hierarchic-tree/rtf:*/@id)]">
+                    [not(utls:contains-id(@id, $hierarchic-tree/rtf:*/@id))]">
                     
                     <xsl:sort select="@name"/>
                     <xsl:if test="current()/@name ne '&owl-thing;' or exists(current()/@auto-generated)">
@@ -1080,7 +1102,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 </xsl:for-each>
                 <!-- class restrictions, if subject of axioms -->
 <!--                <xsl:for-each select="$rtf/rtf:class-restriction[utls:contains-id(@ontology-id,$current-ontology-id)]
-                    [@id = $rtf/rtf:axiom/@source-id]">
+                    [utls:contains-id(@id, $rtf/rtf:axiom/@source-id)]">
                     
                     <xsl:sort select="@name"/>
                     <xsl:call-template name=""></xsl:call-template>
@@ -1088,8 +1110,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 
                 <!-- dataranges -->
-                <!-- esclude i datarange di default (utilizzano il prefisso rdf, rdfs e xsd) -->
-                <xsl:for-each select="$rtf/rtf:datarange[utls:contains-id(@ontology-id,$current-ontology-id)]
+                <!-- no default dataranges (dataranges that use rdf, rdfs, xsd and owl prefixes) -->
+                <xsl:for-each select="$rtf/rtf:&datarange;[utls:contains-id(@ontology-id,$current-ontology-id)]
                     [not(utls:contains-prefixes(@name, $owl2-default-prefixes/@prefix))]">
                     
                     <xsl:sort select="@name"/>
@@ -1102,17 +1124,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 
                 <!-- object/data/annotation properties -->
-                <xsl:for-each select="'object-property', 'data-property', 'annotation-property'">
+                <xsl:for-each select="'&object-property;', '&data-property;', '&annotation-property;'">
                     <xsl:variable name="property-type" as="xs:string" select="current()"/>
                     
-                    <!-- nome dei nodi xml corrispondenti al tipo di property corrente -->
+                    <!-- xml nodes names in rtf, corresponding to current property type --> 
                     <xsl:variable name="property-node-names" as="xs:string+" select="
-                        $property-type, if ($property-type eq 'object-property')
-                        then 'object-property-facility' else if ($property-type eq 'data-property')
-                        then 'data-property-facility' else 'annotation-property-facility'"/>
+                        $property-type, if ($property-type eq '&object-property;')
+                        then '&object-property-facility;' else if ($property-type eq '&data-property;')
+                        then '&data-property-facility;' else '&annotation-property-facility;'"/>
                     
                     <xsl:for-each select="$rtf/rtf:*[local-name(.) = $property-node-names]
-                        [utls:contains-id(@ontology-id,$current-ontology-id)][not(@id = $hierarchic-tree/rtf:*/@id)]">
+                        [utls:contains-id(@ontology-id,$current-ontology-id)][not(utls:contains-id(@id, $hierarchic-tree/rtf:*/@id))]">
                         <xsl:sort select="@name"/>
                         
                         <xsl:call-template name="translate-element">
@@ -1125,8 +1147,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
 
                 <!-- individuals -->
-                <xsl:for-each select="$rtf/rtf:individual[utls:contains-id(@ontology-id, $current-ontology-id)]
-                    [not(@id = $hierarchic-tree/rtf:*/@id)]">
+                <xsl:for-each select="$rtf/rtf:&individual;[utls:contains-id(@ontology-id, $current-ontology-id)]
+                    [not(utls:contains-id(@id, $hierarchic-tree/rtf:*/@id))]">
                     <xsl:sort select="@name"/>
                     
                     <xsl:call-template name="translate-element">
@@ -1138,7 +1160,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                         
                 
                 <!-- ontology's rules -->
-                <xsl:for-each select="$rtf/rtf:rule[utls:contains-id(@ontology-id, $current-ontology-id)]">
+                <xsl:for-each select="$rtf/rtf:&rule;[utls:contains-id(@ontology-id, $current-ontology-id)]">
                     <xsl:call-template name="translate-element">
                         <xsl:with-param name="element" select="current()"/>
                     </xsl:call-template>
@@ -1152,39 +1174,42 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     </xsl:template>
     
     
+    <!-- declare entities in rtf param hierarchically sorted -->
     <xsl:template name="hierarchic-visit">
         <xsl:param name="rtf" as="node()"/>
         <xsl:param name="current-ontology" as="xs:string"/>
         <xsl:param name="classes-to-visit" as="node()*"/>
         <xsl:param name="classes-already-visited" as="node()*"/>
 
+        <!-- continue only if there're new classes not already visited -->
         <xsl:if test="exists($classes-to-visit)">
 
-            
+            <!-- divide current class and remander classes -->
             <xsl:variable name="class" as="node()" select="$classes-to-visit[1]"/>
             <xsl:variable name="remainder-classes" as="node()*" select="remove($classes-to-visit, 1)"/>
             
+            <!-- immediate subclasses of current class -->
             <xsl:variable name="next-sub-classes" as="node()*">
 
                 <xsl:variable name="all-sub-classes" as="node()*" select="$rtf/rtf:&class;[utls:contains-id(@ontology-id,$current-ontology)]
-                    [@id = $rtf/rtf:&axiom;[@name eq '&subclassof-axiom;'][@target-id eq $class/@id]/@source-id]"/>
+                    [utls:contains-id(@id, $rtf/rtf:&axiom;[@name eq '&subclassof-axiom;'][utls:contains-id($class/@id, @target-id)]/@source-id)]"/>
 
-                <!-- restituisci solo le subclass che non siano già state visitate o che siano già in attesa -->
+                <!-- return only subclasses not already visited or that are expectant -->
                 <xsl:sequence select="for $sub-class in $all-sub-classes return if (some $taboo in 
                     ($classes-already-visited, $classes-to-visit) satisfies $taboo is $sub-class) then () else $sub-class"/>
             </xsl:variable>
 
             
-            <!-- stampa la classe corrente (non stampa le classi owl:Thing definite dall'utente) -->
+            <!-- print current class (not owl:Thing classes defined by the user) -->
             <xsl:if test="$class/@name ne '&owl-thing;' or exists($class/@auto-generated)">
                 <xsl:copy-of select="$class"/>
             </xsl:if>
             
-            <!-- stampa le object/data/annotation property che hanno per dominio la classe corrente -->
-            <!-- a priori non vengono analizzate le property facility dato che non sono provviste di dominio -->
+            <!-- print object/data/annotation properties that have current class as domain -->
+            <!-- property facilities are not analyzed because they have no domain -->
             <xsl:for-each select="'&object-property;','&data-property;','&annotation-property;'">
                 <xsl:for-each select="$rtf/rtf:*[local-name(.) = current()]
-                    [utls:contains-id(@ontology-id,$current-ontology)][@source-id eq $class/@id]">
+                    [utls:contains-id(@ontology-id,$current-ontology)][utls:contains-id($class/@id, @source-id)]">
                     
                     <xsl:sort select="@name"/>
                     <xsl:copy-of select="current()"/>
@@ -1192,11 +1217,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 </xsl:for-each>
             </xsl:for-each>
             
-            <!-- stampa gli individui appartenenti alla classe corrente -->
+            <!-- print individuals that hold to current class -->
             <xsl:variable name="types-axioms" as="node()*" select="$rtf/rtf:&axiom;[@name eq '&types-axiom;']
-                [@target-id eq $class/@id][utls:contains-id(@ontology-id, $current-ontology)]"/>
+                [utls:contains-id($class/@id, @target-id)][utls:contains-id(@ontology-id, $current-ontology)]"/>
             <xsl:for-each select="$rtf/rtf:&individual;[utls:contains-id(@ontology-id, $current-ontology)]
-                [some $axiom in $types-axioms satisfies $axiom/@source-id eq @id]">
+                [some $axiom in $types-axioms satisfies utls:contains-id(@id, $axiom/@source-id)]">
                 
                 <xsl:sort select="@name"/>
                 <xsl:copy-of select="current()"/>
@@ -1204,7 +1229,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
             </xsl:for-each>
             
             
-            <!-- visita ricorsiva -->
+            <!-- recursive visit -->
             <xsl:call-template name="hierarchic-visit">
                 <xsl:with-param name="rtf" select="$rtf"/>
                 <xsl:with-param name="current-ontology" select="$current-ontology"/>
@@ -1225,7 +1250,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     
     
     
-    <!-- stampa $element in Manchester syntax in accordo alla sua tipologia --> 
+    <!-- translate $element to Manchester syntax according to its type -->
     <xsl:template name="translate-element">
         <xsl:param name="rtf" as="node()?"/>
         <xsl:param name="element" as="node()"/>
@@ -1245,10 +1270,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 <xsl:value-of select="concat('Ontology: ', $element/@name, $newline)"/>
                 
-                <!-- assiomi riferiti all'ontologia (necessariamente 'Import') -->
-                <xsl:for-each select="$rtf/rtf:&axiom;[@source-id eq $element/@id]">
+                <!-- axioms referred to ontology (necessarily 'Import') -->
+                <xsl:for-each select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)]">
                     <xsl:value-of select="concat(@name, ': ', utls:get-imported-ontology-iri(
-                        $rtf/rtf:*[@id eq current()/@target-id]/@name), $newline)"/>
+                        $rtf/rtf:*[utls:contains-id(@id, current()/@target-id)]/@name), $newline)"/>
                 </xsl:for-each>
                 
             </xsl:when>
@@ -1259,10 +1284,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 <xsl:value-of select="concat('Class: ', $element/@name, $newline)"/>
                 
-                <!-- assiomi riferiti alla classe -->
-                <xsl:for-each-group select="$rtf/rtf:&axiom;[@source-id eq $element/@id]" group-by="@name">
+                <!-- axioms -->
+                <xsl:for-each-group select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)]" group-by="@name">
                     <xsl:value-of select="concat($tab, @name, ': ',
-                        string-join($rtf/rtf:*[@id = current-group()/@target-id]/@name, ', '), $newline)"/>
+                        string-join($rtf/rtf:*[utls:contains-id(@id, current-group()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:for-each-group>
                 
             </xsl:when>
@@ -1273,10 +1298,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 <xsl:value-of select="concat('Datatype: ', $element/@name, $newline)"/>
                 
-                <!-- assiomi -->
-                <xsl:for-each-group select="$rtf/rtf:&axiom;[@source-id eq $element/@id]" group-by="@name">
+                <!-- axioms -->
+                <xsl:for-each-group select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)]" group-by="@name">
                     <xsl:value-of select="concat($tab, @name, ': ',
-                        string-join($rtf/rtf:*[@id eq current-group()/@target-id]/@name, ', '), $newline)"/>
+                        string-join($rtf/rtf:*[utls:contains-id(@id, current-group()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:for-each-group>
                 
             </xsl:when>
@@ -1295,18 +1320,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 <xsl:value-of select="concat($manchester-term, ': ', $element/@name, $newline)"/>
                 
-                <!-- assiomi -->
-                <xsl:for-each-group select="$rtf/rtf:&axiom;[@source-id eq $element/@id]" group-by="@name">
+                <!-- axioms -->
+                <xsl:for-each-group select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)]" group-by="@name">
                     <xsl:value-of select="concat($tab, @name, ': ',
-                        string-join($rtf/rtf:*[@id eq current-group()/@target-id]/@name, ', '), $newline)"/>
+                        string-join($rtf/rtf:*[utls:contains-id(@id, current-group()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:for-each-group>
                     
-                <!-- le facilities e le property ottenute per punning non sono provvisti di dominio e codominio -->
+                <!-- properties and facilities obtained by punning are not equipped with domain and range -->
                 <xsl:if test="$element/@source-id">
-                    <xsl:value-of select="concat($tab, 'Domain: ', $rtf/rtf:*[@id eq current()/@source-id]/@name, $newline)"/>
+                    <xsl:value-of select="concat($tab, 'Domain: ', string-join($rtf/rtf:*[utls:contains-id(@id, current()/@source-id)]/@name, ', '), $newline)"/>
                 </xsl:if>
                 <xsl:if test="$element/@target-id">
-                    <xsl:value-of select="concat($tab, 'Range: ', $rtf/rtf:*[@id eq current()/@target-id]/@name, $newline)"/>
+                    <xsl:value-of select="concat($tab, 'Range: ', string-join($rtf/rtf:*[utls:contains-id(@id, current()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:if>
                 
             </xsl:when>
@@ -1317,16 +1342,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 
                 <xsl:value-of select="concat('Individual: ', $element/@name, $newline)"/>
                 
-                <!-- assiomi owl -->
-                <xsl:for-each-group select="$rtf/rtf:&axiom;[@source-id eq $element/@id][exists(@owl-axiom)]" group-by="@name">
+                <!-- owl axioms -->
+                <xsl:for-each-group select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)][exists(@owl-axiom)]" group-by="@name">
                     <xsl:value-of select="concat($tab, @name, ': ', 
-                        string-join($rtf/rtf:*[@id eq current-group()/@target-id]/@name, ', '), $newline)"/>
+                        string-join($rtf/rtf:*[utls:contains-id(@id, current-group()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:for-each-group>
                 
-                <!-- assiomi non owl ('Facts') -->
-                <xsl:for-each-group select="$rtf/rtf:&axiom;[@source-id eq $element/@id][empty(@owl-axiom)]" group-by="@name">
+                <!-- not owl axioms ('Facts') -->
+                <xsl:for-each-group select="$rtf/rtf:&axiom;[utls:contains-id($element/@id, @source-id)][empty(@owl-axiom)]" group-by="@name">
                     <xsl:value-of select="concat($tab, 'Facts: ', @name, ': ', 
-                        string-join($rtf/rtf:*[@id eq current-group()/@target-id]/@name, ', '), $newline)"/>
+                        string-join($rtf/rtf:*[utls:contains-id(@id, current-group()/@target-id)]/@name, ', '), $newline)"/>
                 </xsl:for-each-group>
                 
             </xsl:when>
@@ -1341,7 +1366,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         </xsl:choose>
         
         <!-- additional axiom -->
-        <xsl:for-each-group select="$rtf/rtf:additional-axiom[@target-id eq $element/@id]" group-by="@name">
+        <xsl:for-each-group select="$rtf/rtf:&additional-axiom;[utls:contains-id($element/@id, @target-id)]" group-by="@name">
             <xsl:value-of select="concat(if ($element-type ne 'ontology') then $tab else (), @name, $newline)"/>
         </xsl:for-each-group>
         

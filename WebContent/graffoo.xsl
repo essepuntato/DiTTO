@@ -1,19 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2014, Riccardo Falco <rky.falco@gmail.com>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
--->
 <!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
 <xsl:stylesheet version="2.0" 
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -103,13 +88,26 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         
         
         <!-- 5th partial translation -->
+        <xsl:variable name="remove-duplicates-result" as="node()">
+            <xsl:element name="remove-duplicates-result" namespace="{$rtf-namespace}">
+               
+                <!-- remove duplicated entities -->
+                <xsl:call-template name="remove-duplicates">
+                    <xsl:with-param name="rtf" select="$analyze-manchester-strings-and-swrl-rules-result"/>
+                </xsl:call-template>
+                
+            </xsl:element>
+        </xsl:variable>
+        
+        
+        <!-- 6th partial translation -->
         <xsl:variable name="manchester-result" as="node()">
             <xsl:element name="manchester-result" namespace="{$rtf-namespace}">
                 
                 <!-- translate to Manchester OWL syntax and sort Manchester statements
                     (default or hierarchical order) -->
                 <xsl:call-template name="translate-to-manchester">
-                    <xsl:with-param name="rtf" select="$analyze-manchester-strings-and-swrl-rules-result"/>
+                    <xsl:with-param name="rtf" select="$remove-duplicates-result"/>
                 </xsl:call-template>
                 
             </xsl:element>
@@ -136,11 +134,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
                 <xsl:copy-of select="$analyze-manchester-strings-and-swrl-rules-result"/>
             </xsl:result-document>
             <xsl:result-document format="xml" 
-                href="../output/5-{local-name($manchester-result)}.xml">
+                href="../output/5-{local-name($remove-duplicates-result)}.xml">
+                <xsl:copy-of select="$remove-duplicates-result"/>
+            </xsl:result-document>
+            <xsl:result-document format="xml" 
+                href="../output/6-{local-name($manchester-result)}.xml">
                 <xsl:copy-of select="$manchester-result"/>
             </xsl:result-document>
             <xsl:result-document format="manchester" 
-                href="../output/5-{local-name($manchester-result)}.txt">
+                href="../output/6-{local-name($manchester-result)}.txt">
                 <xsl:copy-of select="$manchester-result"/>
             </xsl:result-document>
             
@@ -150,8 +152,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         <!-- direct output of one intermediate result (update xsl:output method) -->
 <!--        <xsl:copy-of select="$import-graphml-result"/>-->
 <!--        <xsl:copy-of select="$punning-result"/>-->
-<!--        <xsl:copy-of select="$ontology-imports-results"/>-->
+<!--        <xsl:copy-of select="$ontology-imports-result"/>-->
 <!--        <xsl:copy-of select="$analyze-manchester-strings-result"/>-->
+<!--        <xsl:copy-of select="$remove-duplicates-result"/>-->
         <xsl:choose>
             
             <!-- print all ontologies in the Graffoo diagram -->

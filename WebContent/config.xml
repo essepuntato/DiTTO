@@ -101,6 +101,7 @@
         
         <!-- private prefixes of OWL2 to include automatically in the generated ontology -->
         <default-prefixes>
+            <prefix prefix="dc" uri="http://purl.org/dc/elements/1.1/"/>
             <prefix prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
             <prefix prefix="rdfs" uri="http://www.w3.org/2000/01/rdf-schema#"/>
             <prefix prefix="owl" uri="http://www.w3.org/2002/07/owl#"/>
